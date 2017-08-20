@@ -16,9 +16,9 @@ impl Gameboard {
     pub fn new() ->Gameboard {
         Gameboard {
             perspective: false,
-            cells: [[7, 3, 5, 9, 11, 5, 3, 7],
-                    [1, 1, 1, 1, 1, 1, 1, 1],
-                    [0, 0, 0, 0, 0, 0, 0, 0],
+            cells: [[7, 3, 5, 9, 11, 2, 3, 7],
+                    [1, 1, 1, 1, 1, 1, 2, 1],
+                    [0, 0, 0, 0, 0, 0, 0, 2],
                     [0, 0, 0, 0, 0, 0, 0, 0],
                     [0, 0, 0, 0, 0, 0, 0, 0],
                     [0, 0, 0, 0, 0, 0, 0, 0],
@@ -49,6 +49,7 @@ impl Gameboard {
     pub fn set(&mut self, ind: [usize; 2], val: u8) {
         self.cells[ind[1]][ind[0]] = val;
     }
+
     pub fn get_cell_value(&mut self, ind: [usize; 2]) -> u8 {
         self.cells[ind[1]][ind[0]]
     }
@@ -64,23 +65,100 @@ impl Gameboard {
             false
         }
     }
+
+    pub fn check_against_board_edge(&mut self, x: i32, y: i32) -> bool {
+        if x>7 || y>7 || x<0 || y<0 {
+            false
+        }
+        else {
+            true
+        }
+    }
+
     pub fn generate_legal_move_set(&mut self, ind: [usize; 2]) -> Vec<[usize; 2]>{
         let mut vec: Vec<[usize; 2]> = Vec::new();
         let ownership=self.check_tile_ownership(ind);
         if ownership {
             let cell_value = self.get_cell_value(ind);
             //White Pawn Legal Move Generation
-            if cell_value==2 {
-                let one_forward=[ind[0],ind[1]-1];
-                vec.push(one_forward);
-                if self.turn_number==0 {
-                    let two_forward =[ind[0],ind[1]-2];
-                    vec.push(two_forward);
+            if cell_value == 2 {
+                if self.check_against_board_edge(ind[0] as i32, (ind[1] as i32) - 1) {
+                    let one_forward = [ind[0], ind[1] - 1];
+                    vec.push(one_forward);
+                }
+
+
+                if ind[1] == 6 {
+                    if self.check_against_board_edge(ind[0] as i32, (ind[1] as i32) - 2) {
+                        let two_forward = [ind[0], ind[1] - 2];
+                        vec.push(two_forward);
+                    }
+                }
+
+            }
+                else if cell_value == 4 || cell_value ==3 {
+
+                    if self.check_against_board_edge((ind[0] as i32) - 1, (ind[1] as i32) - 2) {
+                        vec.push([ind[0] - 1, ind[1] - 2]);
+                    }
+                    if self.check_against_board_edge((ind[0] as i32) + 1, (ind[1] as i32) - 2) {
+                       vec.push([ind[0] + 1, ind[1] - 2]);
+                    }
+                    if self.check_against_board_edge((ind[0] as i32) + 1, (ind[1] as i32) + 2) {
+                        vec.push([ind[0] + 1, ind[1] + 2]);
+                    }
+                    if self.check_against_board_edge((ind[0] as i32) - 1, (ind[1] as i32) + 2) {
+                        vec.push([ind[0] - 1, ind[1] + 2]);
+                    }
+                    if self.check_against_board_edge((ind[0] as i32) - 2, (ind[1] as i32) - 1) {
+                        vec.push([ind[0] - 2, ind[1] - 1]);
+                    }
+                    if self.check_against_board_edge((ind[0] as i32) + 2, (ind[1] as i32) - 1) {
+                        vec.push([ind[0] + 2, ind[1] - 1]);
+                    }
+                    if self.check_against_board_edge((ind[0] as i32) + 2, (ind[1] as i32) + 1) {
+                        vec.push([ind[0] + 2, ind[1] + 1]);
+                    }
+                    if self.check_against_board_edge((ind[0] as i32) - 2, (ind[1] as i32) + 1) {
+                        vec.push([ind[0] - 2, ind[1] + 1]);
+                    }
+                }
+            else if cell_value == 11 || cell_value == 12 {
+                if self.check_against_board_edge((ind[0] as i32) + 1, (ind[1] as i32) + 1) {
+                    vec.push([ind[0] + 1, ind[1] + 1]);
+                }
+                if self.check_against_board_edge((ind[0] as i32) + 1, (ind[1] as i32) + 0) {
+                    vec.push([ind[0] + 1, ind[1] + 0]);
+                }
+                if self.check_against_board_edge((ind[0] as i32) + 1, (ind[1] as i32) - 1) {
+                    vec.push([ind[0] + 1, ind[1] - 1]);
+                }
+                if self.check_against_board_edge((ind[0] as i32) + 0, (ind[1] as i32) + 1) {
+                    vec.push([ind[0] + 0, ind[1] + 1]);
+                }
+                if self.check_against_board_edge((ind[0] as i32) + 0, (ind[1] as i32) - 1) {
+                    vec.push([ind[0] + 0, ind[1] - 1]);
+                }
+                if self.check_against_board_edge((ind[0] as i32) -1, (ind[1] as i32) +1) {
+                    vec.push([ind[0] - 1, ind[1] + 1]);
+                }
+                if self.check_against_board_edge((ind[0] as i32) -1, (ind[1] as i32) + 0) {
+                    vec.push([ind[0] - 1, ind[1] + 0]);
+                }
+                if self.check_against_board_edge((ind[0] as i32) - 1, (ind[1] as i32) - 1) {
+                    vec.push([ind[0] - 1, ind[1] - 1]);
+                }
                 }
             }
-        }
 
         vec
+    }
+
+    pub fn move_piece(&mut self, origin: [usize; 2], target: [usize; 2]) {
+        let piece=self.get_cell_value(origin);
+        self.set(target, piece);
+        self.set(origin, 0);
+
     }
 
 }
